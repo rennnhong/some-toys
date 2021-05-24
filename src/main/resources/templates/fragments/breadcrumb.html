@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div class="container-fluid" th:fragment="breadcrumb">
+    <div class="row mb-2">
+        <div class="col-sm-6">
+            <h1 th:text="${list.get(list.size()-1)}">Fixed Navbar Layout</h1>
+        </div>
+        <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right" >
+                <th:block th:each="path : ${list}">
+                    <li class="breadcrumb-item"><a th:text="${path}"></a></li>
+                </th:block>
+            </ol>
+        </div>
+    </div>
+</div><!-- /.container-fluid -->
+​
+</body>
+</html>

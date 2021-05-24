@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="layout/layout">
+
+<head>
+</head>
+
+<body>
+<div class="container-fluid" layout:fragment="content">
+    <div class="row justify-content-center align-items-center">
+        <div class="col-10">
+            <!-- Default box -->
+            <div class="card card-outline card-primary">
+                <div class="card-header">
+                    <h3 class="card-title">抽籤</h3>
+                </div>
+                <!-- /.card-header -->
+                <div class="card-body">
+                    <div class="row justify-content-center align-items-center">
+                        <div id="number1">
+                        </div>
+                        <div id="number2">
+                        </div>
+                    </div>
+                    <div class="modal-footer justify-content-center">
+                        <button id="btn-drawlots-confirm" type="button" class="btn btn-primary" onclick="doDrawLots()">
+                            執行
+                        </button>
+                    </div>
+
+                    <div class="callout callout-info">
+                        <h5>程式說明</h5>
+
+                        <p>這是一個抽籤的小程式，按下按鈕會在5秒後停止，並產出一個1-99之間的數字</p>
+                    </div>
+                </div>
+                <!-- /.card-body -->
+            </div>
+            <!-- /.card -->
+        </div>
+    </div>
+    <!-- page script -->
+    <script>
+        var formModal;
+        var queryFormModal
+
+        var imgArr = new Array(10);
+        var maxNumber = 99;
+        var number1 = $('#number1')
+        var number2 = $('#number2')
+        $.ajax({
+            type: "GET",
+            async: false,
+            url: 'api/drawlots/numbers',
+            data: $(this).serialize(), // serializes the form's elements.
+            success: function (data, textStatus, xhr) {
+                for (let i = 0; i < 10; i++) {
+                    let tag = `<img src="data:image/png;base64, ${data[i]}" width="200" height="200" />`
+                    imgArr[i] = tag;
+                }
+            }
+        });
+
+        number1.html(imgArr[0])
+        number2.html(imgArr[0])
+
+        $('#btn_show_drawlots').click(function (e) {
+            showDrawlotsView();
+        });
+
+        function doDrawLots() {
+            let n1, n2;
+            let intervalID = setInterval(function () {
+                let x = Math.floor(Math.random() * maxNumber) + 1
+                let xArr = numberToArray(x)
+                // console.log("xArr=" + xArr)
+                n1 = xArr[0]
+                n2 = xArr[1]
+                number1.html(imgArr[n1])
+                number2.html(imgArr[n2])
+            }, 100);
+
+            let timeoutID = setTimeout(function () {
+                clearInterval(intervalID)
+            }, 3000);
+        }
+
+        function numberToArray(number) {
+            let myFunc = num => Number(num);
+            let intArr = Array.from(String(number), myFunc);
+            if (intArr.length < 2) return [0, intArr[0]]
+
+            return intArr;
+        }
+    </script>
+</div>
+</body>
+
+
+</html>

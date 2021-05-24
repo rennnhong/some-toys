@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout">
+<head th:replace="fragments/header :: header">
+    <title>Header</title>
+</head>
+<body class="hold-transition sidebar-mini layout-navbar-fixed">
+<!-- Site wrapper -->
+<div class="wrapper">
+    <!-- Navbar -->
+    <div th:replace="fragments/navigation :: navigation"></div>
+    <!-- /.navbar -->
+
+    <!-- Main Sidebar Container -->
+    <div th:replace="fragments/sidebar :: sidebar"></div>
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+<!--        <section class="content-header">-->
+<!--            <div th:replace="fragments/breadcrumb :: breadcrumb"></div>-->
+<!--        </section>-->
+
+        <!-- Main content -->
+        <section class="content">
+            <div layout:fragment="content"></div>
+        </section>
+        <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
+
+    <div th:replace="fragments/footer :: footer"></div>
+
+    <!-- Control Sidebar -->
+    <aside class="control-sidebar control-sidebar-dark">
+        <!-- Control sidebar content goes here -->
+    </aside>
+    <!-- /.control-sidebar -->
+
+    <div th:replace="resources/plugin"></div>
+</div>
+<!-- ./wrapper -->
+
+
+</body>
+</html>
