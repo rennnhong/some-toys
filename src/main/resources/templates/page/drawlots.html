@@ -9,6 +9,9 @@
 
 <body>
 <div class="container-fluid" layout:fragment="content">
+    <!-- bootstrap slider -->
+    <link rel="stylesheet" href="/webjars/AdminLTE/3.0.5/plugins/bootstrap-slider/css/bootstrap-slider.min.css">
+
     <div class="row justify-content-center align-items-center">
         <div class="col-10">
             <!-- Default box -->
@@ -19,13 +22,21 @@
                 <!-- /.card-header -->
                 <div class="card-body">
                     <div class="row justify-content-center align-items-center">
+                        <div class="slider-blue">
+                            <input name="人數" type="text" value="" class="slider form-control" data-slider-min="0"
+                                   data-slider-max="99"
+                                   data-slider-step="1" data-slider-value="1" data-slider-orientation="horizontal"
+                                   data-slider-tooltip="always">
+                        </div>
+                    </div>
+                    <div class="row justify-content-center align-items-center">
                         <div id="number1">
                         </div>
                         <div id="number2">
                         </div>
                     </div>
                     <div class="modal-footer justify-content-center">
-                        <button id="btn-drawlots-confirm" type="button" class="btn btn-primary" onclick="doDrawLots()">
+                        <button id="btn-drawlots-begin" type="button" class="btn btn-primary">
                             執行
                         </button>
                     </div>
@@ -33,7 +44,7 @@
                     <div class="callout callout-info">
                         <h5>程式說明</h5>
 
-                        <p>這是一個抽籤的小程式，按下按鈕會在5秒後停止，並產出一個1-99之間的數字</p>
+                        <p>這是一個抽籤的小程式，按下按鈕會在5秒後停止，並隨機產出一個設定範圍之間的數字</p>
                     </div>
                 </div>
                 <!-- /.card-body -->
@@ -41,13 +52,14 @@
             <!-- /.card -->
         </div>
     </div>
+    <script src="/webjars/AdminLTE/3.0.5/plugins/bootstrap-slider/bootstrap-slider.min.js"></script>
     <!-- page script -->
     <script>
         var formModal;
         var queryFormModal
 
         var imgArr = new Array(10);
-        var maxNumber = 99;
+        var maxNumber = 0;
         var number1 = $('#number1')
         var number2 = $('#number2')
         $.ajax({
@@ -66,8 +78,22 @@
         number1.html(imgArr[0])
         number2.html(imgArr[0])
 
-        $('#btn_show_drawlots').click(function (e) {
-            showDrawlotsView();
+        var beginDrawlotsBtn = $('#btn-drawlots-begin')
+
+        var mySlider
+
+        $(function () {
+            /* BOOTSTRAP SLIDER */
+            mySlider = $('.slider').bootstrapSlider()
+
+            mySlider.change(function (obj){
+                maxNumber = obj.value.newValue
+            })
+        })
+
+        beginDrawlotsBtn.click(function (e) {
+            disableControlItem()
+            doDrawLots()
         });
 
         function doDrawLots() {
@@ -84,7 +110,17 @@
 
             let timeoutID = setTimeout(function () {
                 clearInterval(intervalID)
+                enableControlItem()
             }, 3000);
+        }
+
+        function disableControlItem(){
+            beginDrawlotsBtn.attr("disabled",true)
+            mySlider.bootstrapSlider('disable')
+        }
+        function enableControlItem(){
+            beginDrawlotsBtn.attr("disabled",false)
+            mySlider.bootstrapSlider('enable')
         }
 
         function numberToArray(number) {
@@ -94,6 +130,8 @@
 
             return intArr;
         }
+
+
     </script>
 </div>
 </body>
