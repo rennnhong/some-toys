@@ -1,13 +1,15 @@
 package indi.rennnhong.staterkit.module.drawlots.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.ResourceUtils;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import sun.misc.BASE64Encoder;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
 import java.text.MessageFormat;
-import java.util.Arrays;
 
 @RestController
 @RequestMapping("api/drawlots")
@@ -46,7 +48,7 @@ public class DrawLotsApiController {
         //對位元組陣列Base64編碼
         BASE64Encoder encoder = new BASE64Encoder();
         String encode = encoder.encode(data);
-        System.out.println(encode);
+//        System.out.println(encode);
         return encode;//返回Base64編碼過的位元組陣列字串
     }
 }
