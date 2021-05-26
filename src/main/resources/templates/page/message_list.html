@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="layout/layout">
+
+<head>
+</head>
+
+<body>
+<div class="container-fluid" layout:fragment="content">
+    <!--新增視窗-->
+    <div class="modal fade" id="modal-form">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Modal</h4>
+                    <button type="button" id="modal-form-button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div id="modal-body-form" class="modal-body">
+                </div>
+                <div class="modal-footer justify-content-between">
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--商品列表-->
+    <div class="row">
+        <div class="col-12">
+            <!-- Default box -->
+            <div class="card card-outline card-primary">
+                <div class="card-header">
+                    <h3 class="card-title">公告發布</h3>
+                </div>
+                <button id="btn_show_create" type="button" class="btn btn-primary">新增</button>
+                <!-- /.card-header -->
+                <div class="card-body">
+                    <div>
+                        <table id="datalist" class="table table-bordered table-hover display">
+                            <thead>
+                            <tr>
+                                <th>名稱</th>
+                                <th>說明</th>
+                                <th>附件</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                            <tfoot>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+                <!-- /.card-body -->
+            </div>
+            <!-- /.card -->
+        </div>
+    </div>
+    <div class="row justify-content-center">
+        <div class="callout callout-info">
+            <h5>程式說明</h5>
+            <p>此程式演示了發布公告及可上傳附件，並由後端將檔案於資料庫存成BLOB</p>
+        </div>
+    </div>
+    <div th:replace="resources/datatable"></div>
+
+    <!-- page script -->
+    <script>
+        var formModal = $('#modal-form');
+
+        var dataTable = $('#datalist').DataTable({
+            "autoWidth": false,
+            serverSide: true,
+            ajax: {
+                contentType: 'application/json',
+                type: 'POST',
+                // url: '/api/student/search',
+                url: 'api/messages/queries',
+                data: function (d) {
+                    return JSON.stringify(d);
+                }
+            },
+            "columns": [
+                {
+                    data: "name"
+                },
+                {
+                    data: "description"
+                },
+                {
+                    //這裡的data變數值為sysid，相等於row.sysid
+                    data: "id",//資料行繫結屬性
+                    orderable: false, // 禁用排序
+                    width: "10%",
+                    render: function (data, type, row, meta) {
+                        //row指的是資料列物件 data變數相等於row.sysid
+                        // data = "\'"+data+"\'"
+                        return `<button id='btn-show-detail' type='button' data-toggle='modal' data-target='#model-form'  onclick='showAttachments(&#39;${data}&#39;)' >下載附件</button>`;
+
+                    }
+                }
+            ]
+        });
+
+        $('#btn_show_create').click(function (e) {
+            showCreateView();
+        });
+
+        function showCreateView() {
+            $.get('/messages/fragment/create')
+                .done(function (data) {
+                    appendCreateFormHtml(data);
+                    formModal.modal('show');
+                });
+        }
+
+        function showAttachments(id) {
+            $.get(`messages/${id}/fragment/attachemts`)
+                .done(function (data) {
+                    appendAttachmentListHtml(data);
+                    formModal.modal('show');
+                });
+        }
+
+        function appendCreateFormHtml(data) {
+            $('#modal-body-form').html(data);
+            $('#form-create').bind("submit", onBtnCreateConfirmSubmit);
+        }
+
+        function appendAttachmentListHtml(data) {
+            $('#modal-body-form').html(data);
+        }
+
+        var onBtnCreateConfirmSubmit = function (e) {
+
+            // 取得form
+            var form = $('#form-create')[0]; //取得HTML中第一個form id為UploadForm
+
+            var data = new FormData(form); //將form內的所有訊息打包成FormData object
+            changeBtnState()
+            $.ajax({
+                type: "POST",
+                enctype: 'multipart/form-data',
+                url: '/messages',
+                data: data, // serializes the form's elements.
+                cache: false,
+                processData: false,
+                contentType: false,
+                success: function (data, textStatus, xhr) {
+                    let ct = xhr.getResponseHeader("content-type")
+
+                    if (ct.indexOf('html') > -1) {
+                        appendCreateFormHtml(data);
+                    }
+                    if (ct.indexOf('json') > -1) {
+                        showSuccessToast('新增成功');
+                        formModal.modal('hide');
+                        dataTable.ajax.reload();
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus) {
+                    console.log(XMLHttpRequest);  //XMLHttpRequest.responseText    XMLHttpRequest.status   XMLHttpRequest.readyState
+                    console.log(textStatus);
+                }
+            });
+            e.preventDefault();
+        }
+
+        function changeBtnState() {
+            $("#btn-create-confirm").toggle()
+            $("#btn-create-loading").toggle()
+        }
+
+        const Toast = Swal.mixin({
+            toast: true,
+            position: 'top',
+            showConfirmButton: false,
+            timer: 3000
+        });
+
+        function showSuccessToast(title) {
+            Toast.fire({
+                icon: 'success',
+                title: title
+            })
+        }
+    </script>
+</div>
+</body>
+
+
+</html>
